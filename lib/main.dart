@@ -33,7 +33,7 @@ void main() async {
   DRTModel model = DRTModel();
   GetIt.I.registerSingleton<DRTModel>(model);
 
-  model.initialize();
+  await model.initialize();
   runApp(DRT(model));
 }
 

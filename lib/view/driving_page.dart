@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class DRTDrivingPage extends StatelessWidget {
   static const routeName = '/driving';
 
-  Widget _buildBody(BuildContext context, DRTVehicle vehicle) {
+  Widget _buildBody(BuildContext context, Map vehicle) {
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 32),
       children: [
@@ -17,7 +17,7 @@ class DRTDrivingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DRTVehicle vehicle = ModalRoute.of(context).settings.arguments;
+    final Map vehicle = ModalRoute.of(context).settings.arguments;
     return DRTBlankPage(_buildBody(context, vehicle));
   }
 }

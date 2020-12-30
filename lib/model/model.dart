@@ -1,4 +1,5 @@
 import 'package:drt_app/model/account_model.dart';
+import 'package:drt_app/model/vehicle_model.dart';
 import 'package:drt_app/util/server_driver.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
@@ -16,4 +17,4 @@ abstract class DRTBaseModel extends Model {
 }
 
 class DRTModel extends DRTBaseModel
-    with DRTAccountModel {}
+    with DRTAccountModel, DRTVehicleModel {}
