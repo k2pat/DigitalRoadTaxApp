@@ -14,8 +14,11 @@ class _DRTVehiclesListPageState extends State<DRTVehiclesListPage> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<DRTModel>(
       builder: (context, child, model) {
-        List vehicles = model.data['u_vehicles'];
-        return new ListView.separated(
+        List vehicles = model.data['u_vehicles'] ?? [];
+        if (vehicles.length == 0) {
+          return Text('You have no vehicles');
+        }
+        return ListView.separated(
             padding: EdgeInsets.only(top: 8),
             itemCount: vehicles.length,
             separatorBuilder: (context, index) => Divider(),

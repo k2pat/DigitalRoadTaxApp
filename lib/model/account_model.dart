@@ -18,32 +18,40 @@ mixin DRTAccountModel on DRTBaseModel {
   }
 
   void sync() async {
-    Map params = {
-      'access_token': accessToken,
-    };
-    Map response = await fetch('sync', params);
-    if (!response['success']) throw 'Server returned: ' + response['errorMsg'];
-
-    _data = response['data'];
-    await store.record('data').put(db, _data);
+    try {
+      Map params = {
+        'access_token': accessToken,
+      };
+      Map response = await fetch('sync', params);
+      _data = response;
+      await store.record('data').put(db, _data);
+    }
+    catch (e) {
+      logout();
+    }
   }
 
   void login(mobileNum, password) async {
-    Map params = {
-      'mobile_num': mobileNum,
-      'password': password
-    };
-    Map response = await fetch('login', params);
-    if (!response['success']) throw 'Server returned: ' + response['errorMsg'];
+    try {
+      Map params = {
+        'mobile_num': mobileNum,
+        'password': password,
+        'device_token': deviceToken
+      };
+      Map response = await fetch('login', params);
 
-    _data = response['data'];
-    accessToken = data['u_access_token'];
-    sharedPreferences.setString('access_token', accessToken);
-    loggedIn = true;
+      _data = response;
+      accessToken = data['u_access_token'];
+      sharedPreferences.setString('access_token', accessToken);
+      loggedIn = true;
 
-    await store.record('data').put(db, _data);
+      await store.record('data').put(db, _data);
 
-    navigatorKey.currentState.pushReplacementNamed(DRTHomePage.routeName);
+      navigatorKey.currentState.pushReplacementNamed(DRTHomePage.routeName);
+    }
+    catch (e) {
+      throw e;
+    }
   }
 
   void logout() async {

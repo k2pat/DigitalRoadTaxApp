@@ -8,13 +8,16 @@ import 'package:sembast/sembast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class DRTBaseModel extends Model {
+  final String deviceToken;
   final SharedPreferences sharedPreferences = GetIt.I<SharedPreferences>();
   final Database db = GetIt.I<Database>();
   final store = StoreRef.main();
   final GlobalKey<NavigatorState> navigatorKey = GetIt.I<GlobalKey<NavigatorState>>();
 
-  //DRTModel(this.sharedPreferences, this.db);
+  DRTBaseModel(this.deviceToken);
 }
 
 class DRTModel extends DRTBaseModel
-    with DRTAccountModel, DRTVehicleModel {}
+    with DRTAccountModel, DRTVehicleModel {
+  DRTModel(String deviceToken) : super(deviceToken);
+}

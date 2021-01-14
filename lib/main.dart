@@ -8,6 +8,7 @@ import 'package:drt_app/view/manage_drivers_page.dart';
 import 'package:drt_app/view/notification_settings_page.dart';
 import 'package:drt_app/view/payment_methods_page.dart';
 import 'package:drt_app/view/vehicle_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +21,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  String deviceToken = await firebaseMessaging.getToken();
+  firebaseMessaging.configure(
+    onMessage: (Map<String, dynamic> message) async {
+      print("onMessage: $message");
+      //_showItemDialog(message);
+    },
+    onLaunch: (Map<String, dynamic> message) async {
+      print("onLaunch: $message");
+      //_navigateToItemDetail(message);
+    },
+    onResume: (Map<String, dynamic> message) async {
+      print("onResume: $message");
+      //_navigateToItemDetail(message);
+    },
+  );
+
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   Directory appDocDir = await getApplicationDocumentsDirectory();
   Database db = await databaseFactoryIo.openDatabase(appDocDir.path + '/drt.db');
@@ -30,7 +48,7 @@ void main() async {
   GetIt.I.registerSingleton<GlobalKey<NavigatorState>>(GlobalKey<NavigatorState>());
 
   //DRTModel model = DRTModel(sharedPreferences, db);
-  DRTModel model = DRTModel();
+  DRTModel model = DRTModel(deviceToken);
   GetIt.I.registerSingleton<DRTModel>(model);
 
   await model.initialize();

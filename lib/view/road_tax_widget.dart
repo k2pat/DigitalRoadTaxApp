@@ -90,7 +90,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
     Widget validityWidget;
     if (daysLeft <= 0) {
       validityWidget = _buildExpired(context, expiryDate, daysLeft);
-    } else if (daysLeft <= 10) {
+    } else if (daysLeft <= 14) {
       validityWidget = _buildExpiring(context, expiryDate, daysLeft);
     } else {
       validityWidget = _buildValid(context, expiryDate, daysLeft);
