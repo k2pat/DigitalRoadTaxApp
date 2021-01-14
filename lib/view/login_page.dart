@@ -19,7 +19,7 @@ class _DRTLoginPageState extends State<DRTLoginPage> {
 
   void _login() async {
     try {
-      GetIt.I<DRTModel>().login(_mobileNumController.text, _passwordController.text);
+      await GetIt.I<DRTModel>().login(_mobileNumController.text, _passwordController.text);
     } catch (e) {
       errorSnackBar(context, e);
     }

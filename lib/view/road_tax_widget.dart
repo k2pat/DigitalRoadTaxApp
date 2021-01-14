@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class DRTRoadTaxWidget extends StatelessWidget {
-  final DRTVehicle vehicle;
+  final Map vehicle;
 
   DRTRoadTaxWidget(this.vehicle, {Key key}) : super(key: key);
 
-  Widget _buildValid(BuildContext context) {
+  Widget _buildValid(BuildContext context, DateTime expiryDate, int daysLeft) {
     return Column(
       children: [
         Text(
@@ -19,7 +19,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         Text(
-          DRT.dateFormat.format(vehicle.expiryDate),
+          DRT.dateFormat.format(expiryDate),
           textScaleFactor: 1.5,
           textAlign: TextAlign.center,
         ),
@@ -27,7 +27,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildExpiring(BuildContext context) {
+  Widget _buildExpiring(BuildContext context, DateTime expiryDate, int daysLeft) {
     return Column(
       children: [
         Text(
@@ -37,7 +37,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         Text(
-          DRT.dateFormat.format(vehicle.expiryDate),
+          DRT.dateFormat.format(expiryDate),
           textScaleFactor: 1.5,
           textAlign: TextAlign.center,
         ),
@@ -45,7 +45,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
         ListTile(
           leading: Icon(Icons.warning, color: Colors.orange),
           title: Text(
-            'Road tax expires in ' + vehicle.daysLeft().toString() + ' days',
+            'Road tax expires in ' + daysLeft.toString() + ' days',
             textScaleFactor: 1.25,
             style: TextStyle(color: Colors.orange),
             textAlign: TextAlign.center,
@@ -55,7 +55,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildExpired(BuildContext context) {
+  Widget _buildExpired(BuildContext context, DateTime expiryDate, int daysLeft) {
     return Column(
       children: [
         Text(
@@ -65,7 +65,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         Text(
-          DRT.dateFormat.format(vehicle.expiryDate),
+          DRT.dateFormat.format(expiryDate),
           textScaleFactor: 1.5,
           textAlign: TextAlign.center,
         ),
@@ -73,7 +73,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
         ListTile(
           leading: Icon(Icons.error, color: Colors.red),
           title: Text(
-            'Road tax expired ' + (-1 * vehicle.daysLeft()).toString() + ' days ago',
+            'Road tax expired ' + (-1 * daysLeft).toString() + ' days ago',
             textScaleFactor: 1.2,
             style: TextStyle(color: Colors.red),
             textAlign: TextAlign.center,
@@ -85,19 +85,20 @@ class DRTRoadTaxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int daysLeft = vehicle.daysLeft();
+    DateTime expiryDate = DateTime.parse(vehicle['rt_expiry_dt']);
+    int daysLeft = expiryDate.difference(DateTime.now()).inDays;
     Widget validityWidget;
     if (daysLeft <= 0) {
-      validityWidget = _buildExpired(context);
-    } else if (daysLeft <= 10) {
-      validityWidget = _buildExpiring(context);
+      validityWidget = _buildExpired(context, expiryDate, daysLeft);
+    } else if (daysLeft <= 14) {
+      validityWidget = _buildExpiring(context, expiryDate, daysLeft);
     } else {
-      validityWidget = _buildValid(context);
+      validityWidget = _buildValid(context, expiryDate, daysLeft);
     }
     return Column(
       children: [
         Text(
-          vehicle.regNum,
+          vehicle['ve_reg_num'],
           textScaleFactor: 3,
           style: TextStyle(fontWeight: FontWeight.w300),
           textAlign: TextAlign.center,
@@ -105,7 +106,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(top: 10),
           child: Text(
-            vehicle.make + ' ' + vehicle.model,
+            vehicle['ve_make'] + ' ' + vehicle['ve_model'],
             textScaleFactor: 1.8,
             style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
@@ -114,7 +115,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
         SizedBox(height: 40),
         Center(
           child: QrImage(
-            data: vehicle.regNum,
+            data: vehicle['ve_proof_id'],
             version: QrVersions.auto,
             size: 200.0,
           )

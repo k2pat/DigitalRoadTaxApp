@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "299498335717",
+    "project_id": "drt-app-3379a",
+    "storage_bucket": "drt-app-3379a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299498335717:android:06137b01ce56705b67d30c",
+        "android_client_info": {
+          "package_name": "drt.drt_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "299498335717-9kjetlvpo4ce0n3snb4fkriv8q71rduc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEvzdsfjC6g-6FDXTpmgfm818dF7sCFdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299498335717-9kjetlvpo4ce0n3snb4fkriv8q71rduc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
