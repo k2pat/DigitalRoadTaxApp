@@ -1,4 +1,5 @@
 import 'package:drt_app/model/account_model.dart';
+import 'package:drt_app/model/renew_road_tax_model.dart';
 import 'package:drt_app/model/vehicle_model.dart';
 import 'package:drt_app/util/server_driver.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,10 +15,14 @@ abstract class DRTBaseModel extends Model {
   final store = StoreRef.main();
   final GlobalKey<NavigatorState> navigatorKey = GetIt.I<GlobalKey<NavigatorState>>();
 
+  Map data;
+  bool loggedIn;
+  String accessToken;
+
   DRTBaseModel(this.deviceToken);
 }
 
 class DRTModel extends DRTBaseModel
-    with DRTAccountModel, DRTVehicleModel {
+    with DRTAccountModel, DRTVehicleModel, DRTRenewRoadTaxModel {
   DRTModel(String deviceToken) : super(deviceToken);
 }

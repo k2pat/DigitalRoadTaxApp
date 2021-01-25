@@ -1,23 +1,47 @@
 import 'package:drt_app/main.dart';
-import 'package:drt_app/model/vehicle.dart';
+import 'package:drt_app/model/model.dart';
+import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/view/page.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
-class DRTRenewRoadTaxWidget extends StatefulWidget {
+class DRTRenewRoadTaxPage extends StatefulWidget {
   static final routeName = '/renew_road_tax';
 
   @override
-  _DRTRenewRoadTaxWidgetState createState() => _DRTRenewRoadTaxWidgetState();
+  _DRTRenewRoadTaxPageState createState() => _DRTRenewRoadTaxPageState();
 }
 
-class _DRTRenewRoadTaxWidgetState extends State<DRTRenewRoadTaxWidget> {
+class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
   final _formKey = GlobalKey<FormState>();
-  int validityDuration = 1;
+  Map vehicle;
+  String validityDuration = '1Y';
+  bool doAutoRenew = false;
   int paymentMethod = 0;
   //int effectiveDate = 0;
 
-  Widget _buildBody(BuildContext context) {
+  void _renew() async {
+    try {
+      await GetIt.I<DRTModel>().renew(vehicle, validityDuration, doAutoRenew);
+    } catch (e) {
+      errorSnackBar(context, e);
+    }
+  }
+
+  Widget _buildBody(BuildContext context, Map vehicle) {
     Color primaryColor = Theme.of(context).primaryColor;
+
+    DateTime expiryDate = DateTime.parse(vehicle['rt_expiry_dt']);
+    DateTime effectiveDate = (DateTime.now().isBefore(expiryDate)) ? expiryDate : DateTime.now();
+    DateTime newExpiryDate;
+    int _validityFactor;
+    if (validityDuration == '1Y') {
+      newExpiryDate = DateTime(effectiveDate.year + 1, effectiveDate.month, effectiveDate.day);
+      _validityFactor = 2;
+    } else if (validityDuration == '6M') {
+      newExpiryDate = DateTime(effectiveDate.year, effectiveDate.month + 6, effectiveDate.day);
+      _validityFactor = 1;
+    }
 
     return Form(
       key: _formKey,
@@ -28,14 +52,14 @@ class _DRTRenewRoadTaxWidgetState extends State<DRTRenewRoadTaxWidget> {
             title: Text('Select validity duration', textScaleFactor: 0.95,),
           ),
           RadioListTile(
-            title: Text('6 months'),
-            value: 1,
+            title: Text('1 year'),
+            value: '1Y',
             groupValue: validityDuration,
             onChanged: (value) => setState(() => validityDuration = value),
           ),
           RadioListTile(
-            title: Text('1 year'),
-            value: 2,
+            title: Text('6 months'),
+            value: '6M',
             groupValue: validityDuration,
             onChanged: (value) => setState(() => validityDuration = value),
           ),
@@ -55,17 +79,26 @@ class _DRTRenewRoadTaxWidgetState extends State<DRTRenewRoadTaxWidget> {
           //   onChanged: (value) => setState(() => effectiveDate = value),
           // ),
           SizedBox(height: 16),
+          CheckboxListTile(
+            title: Text('Enable auto-renew'),
+            // subtitle: Text('Road tax will be automatically 1 week before expiry date.'),
+            value: doAutoRenew,
+            onChanged: (value) => setState(() => doAutoRenew = !doAutoRenew),
+          ),
           Divider(),
           ListTile(
             title: Text(
-              'Road tax will expire on ' + DRT.dateFormat.format(DateTime.now().add(Duration(days: 182 * validityDuration))),
-              textScaleFactor: 1,
+              'New expiry date',
+              //textScaleFactor: 1,
+            ),
+            trailing: Text(DRT.dateFormat.format(newExpiryDate),
+              textScaleFactor: 1.25,
             ),
           ),
           ListTile(
-            title: Text('Road tax amount:', textScaleFactor: 1.25),
+            title: Text('Road tax amount'),//, textScaleFactor: 1.25),
             trailing:Text(
-              'RM ' + (80 * validityDuration).toString(),
+              'RM ' + (vehicle['ve_roadtax_rate'] * _validityFactor * 0.5).toStringAsFixed(2),
               textScaleFactor: 2,
               style: TextStyle(fontWeight: FontWeight.w300),
             ),
@@ -118,11 +151,9 @@ class _DRTRenewRoadTaxWidgetState extends State<DRTRenewRoadTaxWidget> {
           RaisedButton(
             child: Text('Proceed', style: TextStyle(color: Colors.white)),
             color: Theme.of(context).accentColor,
-            onPressed: () {
-              //DRT.vehicleList[1].expiryDate = DateTime.parse('2021-11-17');
-            },
+            onPressed: _renew,
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 32),
         ],
       )
     );
@@ -130,7 +161,7 @@ class _DRTRenewRoadTaxWidgetState extends State<DRTRenewRoadTaxWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Map vehicle = ModalRoute.of(context).settings.arguments;
-    return DRTPage('Renew road tax for ' + vehicle['ve_reg_num'], _buildBody(context));
+    vehicle = ModalRoute.of(context).settings.arguments;
+    return DRTPage('Renew road tax for ' + vehicle['ve_reg_num'], _buildBody(context, vehicle));
   }
 }

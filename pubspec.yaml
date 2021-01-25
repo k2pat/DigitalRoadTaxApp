@@ -49,6 +49,10 @@ dependencies:
 
   firebase_messaging: ^7.0.3
 
+  jiffy: ^3.0.1
+
+  flutter_easyrefresh: ^2.1.8
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
