@@ -4,9 +4,12 @@ import 'package:drt_app/model/model.dart';
 import 'package:drt_app/view/driving_page.dart';
 import 'package:drt_app/view/home_page.dart';
 import 'package:drt_app/view/login_page.dart';
+import 'package:drt_app/view/manage_auto_renew_page.dart';
 import 'package:drt_app/view/manage_drivers_page.dart';
 import 'package:drt_app/view/notification_settings_page.dart';
 import 'package:drt_app/view/payment_methods_page.dart';
+import 'package:drt_app/view/renew_road_tax_page.dart';
+import 'package:drt_app/view/renewal_success_page.dart';
 import 'package:drt_app/view/vehicle_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +60,7 @@ void main() async {
 
 class DRT extends StatelessWidget {
   static const APP_TITLE = 'Digital Road Tax';
+  static const DAYS_LEFT_EXPIRING = 14;
   static final dateFormat = DateFormat('d MMMM y');
   final GlobalKey<NavigatorState> navigatorKey = GetIt.I<GlobalKey<NavigatorState>>();
   final DRTModel model;
@@ -85,7 +89,9 @@ class DRT extends StatelessWidget {
               DRTVehiclePage.routeName: (context) => DRTVehiclePage(),
               DRTDrivingPage.routeName: (context) => DRTDrivingPage(),
               DRTPaymentMethodsPage.routeName: (context) => DRTPaymentMethodsPage(),
-              // DRTRenewRoadTaxWidget.routeName: (context) => DRTRenewRoadTaxWidget(),
+              DRTRenewRoadTaxPage.routeName: (context) => DRTRenewRoadTaxPage(),
+              DRTRenewalSuccessPage.routeName: (context) => DRTRenewalSuccessPage(),
+              DRTManageAutoRenewPage.routeName: (context) => DRTManageAutoRenewPage(),
               DRTManageDriversPage.routeName: (context) => DRTManageDriversPage(),
             }
         )

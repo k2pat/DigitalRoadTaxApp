@@ -5,12 +5,6 @@ import 'package:drt_app/view/login_page.dart';
 import 'package:sembast/sembast.dart';
 
 mixin DRTAccountModel on DRTBaseModel {
-  bool loggedIn;
-  String accessToken;
-  Map _data;
-
-  Map get data => _data;
-
   void initialize() async {
     accessToken = sharedPreferences.getString('access_token');
     loggedIn = (accessToken == null || accessToken.isEmpty) ? false : true;
@@ -23,8 +17,8 @@ mixin DRTAccountModel on DRTBaseModel {
         'access_token': accessToken,
       };
       Map response = await fetch('sync', params);
-      _data = response;
-      await store.record('data').put(db, _data);
+      data = response;
+      await store.record('data').put(db, data);
     }
     catch (e) {
       logout();
@@ -40,12 +34,12 @@ mixin DRTAccountModel on DRTBaseModel {
       };
       Map response = await fetch('login', params);
 
-      _data = response;
+      data = response;
       accessToken = data['u_access_token'];
       sharedPreferences.setString('access_token', accessToken);
       loggedIn = true;
 
-      await store.record('data').put(db, _data);
+      await store.record('data').put(db, data);
 
       navigatorKey.currentState.pushReplacementNamed(DRTHomePage.routeName);
     }

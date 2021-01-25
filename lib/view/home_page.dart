@@ -4,7 +4,7 @@ import 'package:drt_app/view/vehicles_list_page.dart';
 import 'package:flutter/material.dart';
 
 class DRTHomePage extends StatefulWidget {
-  static const routeName = '/';
+  static const routeName = '/home';
 
   DRTHomePage({Key key, this.title}) : super(key: key);
 

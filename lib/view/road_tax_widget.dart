@@ -2,6 +2,7 @@ import 'package:drt_app/main.dart';
 import 'package:drt_app/model/vehicle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class DRTRoadTaxWidget extends StatelessWidget {
@@ -73,7 +74,7 @@ class DRTRoadTaxWidget extends StatelessWidget {
         ListTile(
           leading: Icon(Icons.error, color: Colors.red),
           title: Text(
-            'Road tax expired ' + (-1 * daysLeft).toString() + ' days ago',
+            'Road tax expired ' + (-1 * (daysLeft - 1)).toString() + ' days ago',
             textScaleFactor: 1.2,
             style: TextStyle(color: Colors.red),
             textAlign: TextAlign.center,
@@ -86,11 +87,11 @@ class DRTRoadTaxWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime expiryDate = DateTime.parse(vehicle['rt_expiry_dt']);
-    int daysLeft = expiryDate.difference(DateTime.now()).inDays;
+    int daysLeft = expiryDate.add(Duration(days: 1)).difference(DateTime.now()).inDays; // end of expiry day
     Widget validityWidget;
-    if (daysLeft <= 0) {
+    if (Jiffy().isAfter(Jiffy(vehicle['rt_expiry_dt']).endOf(Units.DAY))) {
       validityWidget = _buildExpired(context, expiryDate, daysLeft);
-    } else if (daysLeft <= 14) {
+    } else if (daysLeft <= DRT.DAYS_LEFT_EXPIRING) {
       validityWidget = _buildExpiring(context, expiryDate, daysLeft);
     } else {
       validityWidget = _buildValid(context, expiryDate, daysLeft);
