@@ -1,7 +1,10 @@
 import 'package:drt_app/model/model.dart';
 import 'package:drt_app/util/server_driver.dart';
+import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/view/home_page.dart';
 import 'package:drt_app/view/login_page.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 
 mixin DRTAccountModel on DRTBaseModel {
@@ -42,6 +45,25 @@ mixin DRTAccountModel on DRTBaseModel {
       await store.record('data').put(db, data);
 
       navigatorKey.currentState.pushReplacementNamed(DRTHomePage.routeName);
+    }
+    catch (e) {
+      throw e;
+    }
+  }
+
+  void register(mobileNum, email, password, idNum, idType) async {
+    try {
+      Map params = {
+        'mobile_num': mobileNum,
+        'email': email,
+        'password': password,
+        'id_num': idNum,
+        'id_type': idType,
+      };
+      Map response = await fetch('register', params);
+
+      navigatorKey.currentState.pushNamedAndRemoveUntil(DRTLoginPage.routeName, (route) => false);
+      DRTSnackBar(message: 'Account registered successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
     }
     catch (e) {
       throw e;
