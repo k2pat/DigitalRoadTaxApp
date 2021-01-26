@@ -8,6 +8,7 @@ import 'package:drt_app/view/manage_auto_renew_page.dart';
 import 'package:drt_app/view/manage_drivers_page.dart';
 import 'package:drt_app/view/notification_settings_page.dart';
 import 'package:drt_app/view/payment_methods_page.dart';
+import 'package:drt_app/view/registration_page.dart';
 import 'package:drt_app/view/renew_road_tax_page.dart';
 import 'package:drt_app/view/renewal_success_page.dart';
 import 'package:drt_app/view/vehicle_page.dart';
@@ -83,7 +84,7 @@ class DRT extends StatelessWidget {
             initialRoute: initialRoute,
             routes: {
               DRTLoginPage.routeName: (context) => DRTLoginPage(),
-              // DRTRegistrationPage.routeName: (context) => DRTRegistrationPage(),
+              DRTRegistrationPage.routeName: (context) => DRTRegistrationPage(),
               DRTHomePage.routeName: (context) => DRTHomePage(title: APP_TITLE),
               DRTNotificationSettingsPage.routeName: (context) => DRTNotificationSettingsPage(),
               DRTVehiclePage.routeName: (context) => DRTVehiclePage(),

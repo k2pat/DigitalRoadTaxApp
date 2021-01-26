@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:drt_app/model/model.dart';
 import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/view/home_page.dart';
+import 'package:drt_app/view/registration_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -59,8 +60,8 @@ class _DRTLoginPageState extends State<DRTLoginPage> {
                           filled: true
                         ),
                         obscureText: true,
-                        enableSuggestions: true,
-                        autocorrect: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
                       ),
 
                       SizedBox(height:40),
@@ -81,7 +82,7 @@ class _DRTLoginPageState extends State<DRTLoginPage> {
                 alignment: Alignment.bottomCenter,
                 child: FlatButton(
                   child: Text('No account? Register here', style: TextStyle(color: Colors.white, fontSize: 16, decoration: TextDecoration.underline)),
-                  onPressed: null,//() => Navigator.pushNamed(context, DRTRegistrationPage.routeName),
+                  onPressed: () => Navigator.pushNamed(context, DRTRegistrationPage.routeName),
                 )
               ),
             ],
