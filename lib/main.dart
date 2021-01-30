@@ -27,20 +27,6 @@ void main() async {
 
   FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   String deviceToken = await firebaseMessaging.getToken();
-  firebaseMessaging.configure(
-    onMessage: (Map<String, dynamic> message) async {
-      print("onMessage: $message");
-      //_showItemDialog(message);
-    },
-    onLaunch: (Map<String, dynamic> message) async {
-      print("onLaunch: $message");
-      //_navigateToItemDetail(message);
-    },
-    onResume: (Map<String, dynamic> message) async {
-      print("onResume: $message");
-      //_navigateToItemDetail(message);
-    },
-  );
 
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -55,8 +41,25 @@ void main() async {
   DRTModel model = DRTModel(deviceToken);
   GetIt.I.registerSingleton<DRTModel>(model);
 
+  DRT app = DRT(model);
+
+  firebaseMessaging.configure(
+    onMessage: (Map<String, dynamic> message) async {
+      // print("onMessage: $message");
+      app.handleMessage(message);
+    },
+    onLaunch: (Map<String, dynamic> message) async {
+      print("onLaunch: $message");
+      //_navigateToItemDetail(message);
+    },
+    onResume: (Map<String, dynamic> message) async {
+      print("onResume: $message");
+      //_navigateToItemDetail(message);
+    },
+  );
+
   await model.initialize();
-  runApp(DRT(model));
+  runApp(app);
 }
 
 class DRT extends StatelessWidget {
@@ -97,5 +100,22 @@ class DRT extends StatelessWidget {
             }
         )
     );
+  }
+
+  void handleMessage(Map message) async {
+    Map data = message['data'] ?? null;
+    if (data == null) return;
+
+    String type = data['type'];
+    switch (type) {
+      case 'RENEWAL_SUCCESS':
+        await model.syncVehicles();
+        model.renewalSuccess();
+        break;
+
+      case 'RENEWAL_FAIL':
+        model.renewalFail();
+        break;
+    }
   }
 }

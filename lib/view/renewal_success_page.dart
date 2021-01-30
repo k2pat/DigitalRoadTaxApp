@@ -6,14 +6,14 @@ import 'package:intl/intl.dart';
 class DRTRenewalSuccessPage extends StatelessWidget {
   static final routeName = '/renewal_success';
 
-  Widget _buildBody(BuildContext context, receipt) {
+  Widget _buildBody(BuildContext context, transaction) {
     String validityDuration;
-    if (receipt['rt_validity_duration'] == '1Y')
+    if (transaction['roadtax']['rt_validity_duration'] == '1Y')
       validityDuration = '1 year';
-    else if (receipt['rt_validity_duration'] == '6M')
+    else if (transaction['roadtax']['rt_validity_duration'] == '6M')
       validityDuration = '6 months';
     else
-      validityDuration = receipt['rt_validity_duration'];
+      validityDuration = transaction['roadtax']['rt_validity_duration'];
 
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -38,19 +38,19 @@ class DRTRenewalSuccessPage extends StatelessWidget {
         ),
         ListTile(
           title: Text('Date'),
-          subtitle: Text(DateFormat('d MMMM yyyy, HH:mm:ss').format(DateTime.parse(receipt['tr_dt'])), textScaleFactor: 1.25),
+          subtitle: Text(DateFormat('d MMMM yyyy, HH:mm:ss').format(DateTime.parse(transaction['tr_dt'])), textScaleFactor: 1.25),
         ),
         ListTile(
           title: Text('Transaction ID'),
-          subtitle: Text(receipt['tr_id'], textScaleFactor: 1.25),
+          subtitle: Text(transaction['tr_id'], textScaleFactor: 1.25),
         ),
         ListTile(
           title: Text('Payment Amount'),
-          subtitle: Text('RM ' + receipt['tr_amount'].toStringAsFixed(2), textScaleFactor: 1.25),
+          subtitle: Text('RM ' + transaction['tr_amount'].toStringAsFixed(2), textScaleFactor: 1.25),
         ),
         ListTile(
           title: Text('Vehicle Registration No.'),
-          subtitle: Text(receipt['ve_reg_num'], textScaleFactor: 1.25),
+          subtitle: Text(transaction['roadtax']['ve_reg_num'], textScaleFactor: 1.25),
         ),
         ListTile(
           title: Text('Validity Duration'),
@@ -58,7 +58,7 @@ class DRTRenewalSuccessPage extends StatelessWidget {
         ),
         ListTile(
           title: Text('Expiry Date'),
-          subtitle: Text(DateFormat('d MMMM yyyy').format(DateTime.parse(receipt['rt_expiry_dt'])), textScaleFactor: 1.25),
+          subtitle: Text(DateFormat('d MMMM yyyy').format(DateTime.parse(transaction['roadtax']['rt_expiry_dt'])), textScaleFactor: 1.25),
         )
       ],
     );
@@ -66,8 +66,8 @@ class DRTRenewalSuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map receipt = ModalRoute.of(context).settings.arguments;
-    return DRTPage('Receipt', _buildBody(context, receipt), iconData: Icons.close);
+    final Map transaction = ModalRoute.of(context).settings.arguments;
+    return DRTPage('Receipt', _buildBody(context, transaction), iconData: Icons.close);
   }
 
 }

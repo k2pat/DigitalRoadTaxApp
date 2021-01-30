@@ -10,7 +10,7 @@ mixin DRTVehicleModel on DRTBaseModel {
   //   return vehicles;
   // }
 
-  void syncVehicles() async {
+  Future syncVehicles() async {
     try {
       Map params = {
         'access_token': accessToken,
