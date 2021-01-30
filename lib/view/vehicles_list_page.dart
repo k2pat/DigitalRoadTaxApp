@@ -28,7 +28,10 @@ class _DRTVehiclesListPageState extends State<DRTVehiclesListPage> {
       builder: (context, child, model) {
         List vehicles = model.vehicles ?? [];
         if (vehicles.length == 0) {
-          return Text('You have no vehicles');
+          return EasyRefresh(
+              onRefresh: _refresh,
+              child: Text('You have no vehicles')
+          );
         }
         return EasyRefresh(
           onRefresh: _refresh,

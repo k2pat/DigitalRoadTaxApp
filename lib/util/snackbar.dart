@@ -16,9 +16,10 @@ class DRTSnackBar extends Flushbar {
   );
 }
 
-void errorSnackBar(BuildContext context, String e) {
+void errorSnackBar(BuildContext context, e) {
+  String errorMsg = e is String ? e : e.toString();
   DRTSnackBar(
-    message: 'Error:' + e,
+    message: 'Error:' + errorMsg,
     icon: null,
   ).show(context);
 }

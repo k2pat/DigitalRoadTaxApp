@@ -3,19 +3,26 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:http/io_client.dart';
 
-const URI = 'http://192.168.0.101:8001/app';
+const URI = 'https://192.168.0.101:8001/app';
 const HOST = '192.168.0.101';
 const PORT = 8001;
 
 Future<Map> fetch(route, params) async {
-    Response response = await post(
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback = ((X509Certificate cert, String host, int port) => true);
+    IOClient ioClient = new IOClient(httpClient);
+
+    Response response = await ioClient.post(
       URI + '/' + route,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(params),
     );
+    ioClient.close();
+
     Map body = jsonDecode(response.body);
     if (response.statusCode != 200) throw body['errorMsg'];
     return body;
