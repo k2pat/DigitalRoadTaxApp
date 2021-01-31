@@ -19,7 +19,7 @@ class DRTSnackBar extends Flushbar {
 void errorSnackBar(BuildContext context, e) {
   String errorMsg = e is String ? e : e.toString();
   DRTSnackBar(
-    message: 'Error:' + errorMsg,
+    message: 'Error: ' + errorMsg,
     icon: null,
   ).show(context);
 }
