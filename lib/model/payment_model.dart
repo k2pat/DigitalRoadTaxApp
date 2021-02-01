@@ -7,6 +7,7 @@ import 'package:stripe_payment/stripe_payment.dart';
 
 mixin DRTPaymentModel on DRTBaseModel {
   List cards = [];
+  Map autoRenewPaymentMethods = {};
 
   void fetchCards() async {
     try {
@@ -15,6 +16,7 @@ mixin DRTPaymentModel on DRTBaseModel {
       };
       Map response = await fetch('payment/get_cards', params);
       cards = response['cards'];
+      autoRenewPaymentMethods = response['auto_renew_payment_methods'];
       notifyListeners();
     }
     catch (e) {
@@ -35,17 +37,22 @@ mixin DRTPaymentModel on DRTBaseModel {
 
       fetchCards();
 
-      DRTSnackBar(message: 'Credit card saved successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
+      DRTSnackBar(message: 'Card saved successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
       return paymentMethod.toJson();
     }
     catch (e) {
       if (e.toString() != "PlatformException(cancelled, cancelled, null, null)")
       errorSnackBar(navigatorKey.currentContext, e);
+      return null;
     }
   }
 
   void removeCreditCard(Map cardData) async {
     try {
+      if ((autoRenewPaymentMethods[cardData['id']] ?? []).length > 0) {
+        throw 'Card in use for auto-renew';
+      }
+
       Map params = {
         'access_token': accessToken,
         'payment_method_id': cardData['id'],
@@ -55,7 +62,7 @@ mixin DRTPaymentModel on DRTBaseModel {
 
       fetchCards();
 
-      DRTSnackBar(message: 'Credit card removed successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
+      DRTSnackBar(message: 'Card removed successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
     }
     catch (e) {
       errorSnackBar(navigatorKey.currentContext, e);

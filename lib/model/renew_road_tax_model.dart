@@ -1,4 +1,5 @@
 import 'package:drt_app/model/model.dart';
+import 'package:drt_app/model/payment_method.dart';
 import 'package:drt_app/util/input_formatter.dart';
 import 'package:drt_app/util/process.dart';
 import 'package:drt_app/util/server_driver.dart';
@@ -19,22 +20,7 @@ enum RenewalStatus {
 }
 
 mixin DRTRenewRoadTaxModel on DRTBaseModel {
-  String paymentMethodType;
-  String paymentMethodId;
-  Map paymentMethod;
   RenewalStatus _renewalStatus;
-
-  void setPaymentMethod(type, {Map paymentMethod}) {
-    paymentMethodType = type;
-    if (paymentMethod != null && paymentMethodType == 'CARD') {
-      paymentMethodId = paymentMethod['id'];
-      this.paymentMethod = paymentMethod;
-    } else {
-      paymentMethodId = '';
-      this.paymentMethod = {};
-    }
-    notifyListeners();
-  }
 
   void renew2(Map vehicle, String validityDuration, bool doAutoRenew) async {
     try {
@@ -79,7 +65,7 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
     }
   }
 
-  void renew(Map vehicle, String validityDuration, bool doAutoRenew) async {
+  void renew(Map vehicle, String validityDuration, bool doAutoRenew, DRTPaymentMethod paymentMethod) async {
     try {
       _renewalStatus = RenewalStatus.PENDING;
 
@@ -107,10 +93,10 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
       Map response = await fetch('payment/pay_roadtax', params);
       String clientSecret = response['client_secret'];
 
-      var result = await StripePayment.confirmPaymentIntent(PaymentIntent(paymentMethodId: paymentMethodId, clientSecret: clientSecret));
+      var result = await StripePayment.confirmPaymentIntent(PaymentIntent(paymentMethodId: paymentMethod.paymentMethodId, clientSecret: clientSecret));
 
       await waitWhile(() => _renewalStatus == RenewalStatus.PENDING);
-      if (_renewalStatus != RenewalStatus.SUCCESS) throw 'Error: Failed to renew road tax';
+      // if (_renewalStatus != RenewalStatus.SUCCESS) throw 'Failed to renew road tax';
 
       for (int i = 0; i < data['u_vehicles'].length; i++) {
         if (data['u_vehicles'][i]['ve_reg_num'] == vehicle['ve_reg_num']) {
@@ -138,13 +124,14 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
     _renewalStatus = RenewalStatus.FAIL;
   }
 
-  void updateAutoRenew(Map vehicle, bool autoRenew, String autoRenewDuration) async {
+  void updateAutoRenew(Map vehicle, bool autoRenew, String autoRenewDuration, DRTPaymentMethod paymentMethod) async {
     try {
       Map params = {
         'access_token': accessToken,
         'reg_num': vehicle['ve_reg_num'],
         'auto_renew': autoRenew,
-        'auto_renew_duration': autoRenew ? autoRenewDuration : null
+        'auto_renew_duration': autoRenew ? autoRenewDuration : null,
+        'payment_method': paymentMethod.paymentMethodId
       };
       Map response = await fetch('update_auto_renew', params);
       for (int i = 0; i < data['u_vehicles'].length; i++) {

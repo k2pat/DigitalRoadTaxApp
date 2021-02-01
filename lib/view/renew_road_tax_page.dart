@@ -1,5 +1,6 @@
 import 'package:drt_app/main.dart';
 import 'package:drt_app/model/model.dart';
+import 'package:drt_app/model/payment_method.dart';
 import 'package:drt_app/util/input_formatter.dart';
 import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/view/page.dart';
@@ -25,11 +26,12 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
   DRTModel drtModel = GetIt.I<DRTModel>();
   //int effectiveDate = 0;
   bool _loading = false;
+  DRTPaymentMethod _paymentMethod;
 
   void _renew() async {
     setState(() => _loading = true);
     try {
-      await GetIt.I<DRTModel>().renew(vehicle, validityDuration, doAutoRenew);
+      await GetIt.I<DRTModel>().renew(vehicle, validityDuration, doAutoRenew, _paymentMethod);
     } catch (e) {
       errorSnackBar(context, e);
     }
@@ -37,13 +39,13 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
   }
 
   String _getPaymentMethodLabel() {
-    if (drtModel.paymentMethodType == 'CARD') {
-      return capitalize(drtModel.paymentMethod['card']['brand']) + ' •••• ' + drtModel.paymentMethod['card']['last4'];
+    if (_paymentMethod.paymentMethodType == 'CARD') {
+      return capitalize(_paymentMethod.paymentMethod['card']['brand']) + ' •••• ' + _paymentMethod.paymentMethod['card']['last4'];
     }
-    else if (drtModel.paymentMethodType == 'BANK') {
+    else if (_paymentMethod.paymentMethodType == 'BANK') {
       return 'Online banking';
     }
-    else if (drtModel.paymentMethodType == 'MOBILE') {
+    else if (_paymentMethod.paymentMethodType == 'MOBILE') {
       return 'Mobile billing';
     }
     else {
@@ -76,8 +78,8 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
     }
 
 
-    return ScopedModelDescendant<DRTModel>(
-      builder: (context, child, model) {
+    // return ScopedModelDescendant<DRTPaymentMethod>(
+    //   builder: (context, child, model) {
         return Form(
             key: _formKey,
             child: ListView(
@@ -139,14 +141,18 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
                   ),
                 ),
                 Divider(),
-                ListTile(
-                  title: Text('Payment method', textScaleFactor: 0.95,),
-                  onTap: () => Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName, arguments: true),
-                  trailing: Text('Change', style: TextStyle(color: primaryColor)),
-                  subtitle: Text(_getPaymentMethodLabel(),
-                      textScaleFactor: 1.2,
-                      style: TextStyle(fontWeight: FontWeight.w500)
-                  ),
+                ScopedModelDescendant<DRTPaymentMethod>(
+                  builder: (context, child, model) {
+                    return ListTile(
+                      title: Text('Payment method', textScaleFactor: 0.95,),
+                      onTap: () => Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName, arguments: _paymentMethod),
+                      trailing: Text('Change', style: TextStyle(color: primaryColor)),
+                      subtitle: Text(_getPaymentMethodLabel(),
+                          textScaleFactor: 1.2,
+                          style: TextStyle(fontWeight: FontWeight.w500)
+                      ),
+                    );
+                  }
                 ),
                 // ListTile(
                 //   leading: Radio(value: 1,
@@ -198,13 +204,17 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
               ],
             )
         );
-      }
-    );
+    //   }
+    // );
   }
 
   @override
   Widget build(BuildContext context) {
     vehicle = ModalRoute.of(context).settings.arguments;
-    return DRTPage('Renew road tax for ' + vehicle['ve_reg_num'], _buildStack(context, vehicle));
+    _paymentMethod = DRTPaymentMethod();
+    return ScopedModel<DRTPaymentMethod>(
+        model: _paymentMethod,
+        child: DRTPage('Renew road tax for ' + vehicle['ve_reg_num'], _buildStack(context, vehicle))
+    );
   }
 }

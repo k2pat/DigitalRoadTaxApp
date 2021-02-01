@@ -1,4 +1,5 @@
 import 'package:drt_app/model/model.dart';
+import 'package:drt_app/model/payment_method.dart';
 import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/util/input_formatter.dart';
 import 'package:drt_app/view/page.dart';
@@ -16,6 +17,7 @@ class DRTPaymentMethodsPage extends StatefulWidget {
 
 class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
   DRTModel drtModel = GetIt.I<DRTModel>();
+  DRTPaymentMethod _paymentMethod;
 
   @override
   initState() {
@@ -27,17 +29,21 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
         ));
   }
 
+  void _setPaymentMethod(String type, {Map paymentMethod}) {
+    setState(() => _paymentMethod.setPaymentMethod(type, paymentMethod: paymentMethod));
+  }
+
   void _addCreditCard() async {
     Map paymentMethod = await drtModel.addCreditCard();
     if (paymentMethod != null)
-      drtModel.setPaymentMethod('CARD', paymentMethod: paymentMethod);
+      _setPaymentMethod('CARD', paymentMethod: paymentMethod);
   }
 
   void _removeCreditCard(cardData) async {
     await drtModel.removeCreditCard(cardData);
   }
 
-  Widget _buildSavedPaymentMethods(BuildContext context, cards, {bool checkout = false}) {
+  Widget _buildSavedPaymentMethods(BuildContext context, cards) {
     Color primaryColor = Theme.of(context).primaryColor;
     return ListView.separated(
       shrinkWrap: true,
@@ -47,14 +53,14 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
         Map cardData = cards[index];
         Map card = cardData['card'];
 
-        if (checkout) {
+        if (_paymentMethod != null) {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
               leading: Radio(
                 value: cardData['id'],
-                groupValue: drtModel.paymentMethodId,
-                onChanged: (value) => drtModel.setPaymentMethod('CARD', paymentMethod: cardData),
+                groupValue: _paymentMethod.paymentMethodId,
+                onChanged: (value) => _setPaymentMethod('CARD', paymentMethod: cardData),
               ),
               title: Text(capitalize(card['brand']) + ' •••• ' + card['last4']),
               trailing: Icon(Icons.credit_card, color: primaryColor),
@@ -120,7 +126,7 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
             child: ListTile(
               leading: Radio(
                 value: 'NEWCARD',
-                groupValue: drtModel.paymentMethodType,
+                groupValue: _paymentMethod.paymentMethodType,
                 onChanged: (value) {
                   _addCreditCard();
                 },
@@ -135,8 +141,8 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
             child: ListTile(
               leading: Radio(
                 value: 'BANK',
-                groupValue: drtModel.paymentMethodType,
-                onChanged: (value) => drtModel.setPaymentMethod(value),
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
               ),
               trailing: Icon(Icons.account_balance),
               title: Text('Online Banking'),
@@ -147,8 +153,8 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
             child: ListTile(
               leading: Radio(
                 value: 'MOBILE',
-                groupValue: drtModel.paymentMethodType,
-                onChanged: (value) => drtModel.setPaymentMethod(value),
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
               ),
               trailing: Icon(Icons.speaker_phone),
               title: Text('unifi Mobile billing'),
@@ -158,7 +164,7 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
     );
   }
 
-  Widget _buildBody(BuildContext context, bool checkout) {
+  Widget _buildBody(BuildContext context) {
     return ScopedModelDescendant<DRTModel>(
       builder: (context, child, model) {
         List cards = model.cards ?? [];
@@ -166,9 +172,9 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
           padding: EdgeInsets.symmetric(horizontal: 16),
           children: [
             SizedBox(height: 8),
-            cards.length > 0 ? _buildSavedPaymentMethods(context, cards, checkout: checkout) : SizedBox(height: 0),
+            cards.length > 0 ? _buildSavedPaymentMethods(context, cards) : SizedBox(height: 0),
             cards.length > 0 ? Divider() : SizedBox(height: 0),
-            checkout ? _buildAddPaymentMethodsCheckout() : _buildAddPaymentMethods(),
+            _paymentMethod != null ? _buildAddPaymentMethodsCheckout() : _buildAddPaymentMethods(),
           ],
         );
       }
@@ -177,8 +183,8 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool checkout = ModalRoute.of(context).settings.arguments ?? false;
+    _paymentMethod = ModalRoute.of(context).settings.arguments ?? null;
     GetIt.I<DRTModel>().fetchCards();
-    return DRTPage('Payment methods', _buildBody(context, checkout));
+    return DRTPage('Payment methods', _buildBody(context));
   }
 }
