@@ -31,7 +31,7 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
   void _renew() async {
     setState(() => _loading = true);
     try {
-      await GetIt.I<DRTModel>().renew(vehicle, validityDuration, doAutoRenew, _paymentMethod);
+      await GetIt.I<DRTModel>().handleRenew(vehicle, validityDuration, doAutoRenew, _paymentMethod);
     } catch (e) {
       errorSnackBar(context, e);
     }

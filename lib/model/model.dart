@@ -1,4 +1,5 @@
 import 'package:drt_app/model/account_model.dart';
+import 'package:drt_app/model/auto_renew_model.dart';
 import 'package:drt_app/model/payment_model.dart';
 import 'package:drt_app/model/renew_road_tax_model.dart';
 import 'package:drt_app/model/vehicle_model.dart';
@@ -24,6 +25,6 @@ abstract class DRTBaseModel extends Model {
 }
 
 class DRTModel extends DRTBaseModel
-    with DRTAccountModel, DRTVehicleModel, DRTRenewRoadTaxModel, DRTPaymentModel {
+    with DRTAccountModel, DRTVehicleModel, DRTRenewRoadTaxModel, DRTAutoRenewModel, DRTPaymentModel {
   DRTModel(String deviceToken) : super(deviceToken);
 }

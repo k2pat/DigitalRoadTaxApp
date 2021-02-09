@@ -34,7 +34,7 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
   }
 
   void _addCreditCard() async {
-    Map paymentMethod = await drtModel.addCreditCard();
+    Map paymentMethod = await drtModel.handleAddCreditCard();
     if (paymentMethod != null)
       _setPaymentMethod('CARD', paymentMethod: paymentMethod);
   }

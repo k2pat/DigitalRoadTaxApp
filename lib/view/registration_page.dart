@@ -21,7 +21,7 @@ class _DRTRegistrationPageState extends State<DRTRegistrationPage> {
 
   void _register() async {
     try {
-      await GetIt.I<DRTModel>().register(_mobileNumController.text, _emailController.text, _passwordController.text, _idNumController.text, _idType);
+      await GetIt.I<DRTModel>().handleRegister(_mobileNumController.text, _emailController.text, _passwordController.text, _idNumController.text, _idType);
     } catch (e) {
       errorSnackBar(context, e);
     }

@@ -21,12 +21,18 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 
-void main() async {
+Future<DRT> initialize() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   String deviceToken = await firebaseMessaging.getToken();
+
+  StripePayment.setOptions(StripeOptions(
+    publishableKey: 'pk_test_51IDtdsCFbMmCdmOJ3jHD8cN0K9gYJPjnyTPQUHxarFHXEN0iQLGPLt6s4ptfEK7kJelybeSCyJh3mdHOW5gyHyG700A8mM3TTP',
+    androidPayMode: 'test', // Android only
+  ));
 
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   Directory appDocDir = await getApplicationDocumentsDirectory();
@@ -59,7 +65,11 @@ void main() async {
   );
 
   await model.initialize();
-  runApp(app);
+  return app;
+}
+
+void main({bool testMode = false}) async {
+  runApp(await initialize());
 }
 
 class DRT extends StatelessWidget {
