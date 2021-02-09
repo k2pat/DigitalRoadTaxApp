@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 
 class DRTDrawer extends StatelessWidget {
   void _logout(BuildContext context) {
-    GetIt.I<DRTModel>().logout();
+    GetIt.I<DRTModel>().handleLogout();
     //Navigator.pushNamedAndRemoveUntil(context, DRTLoginPage.routeName, (route) => false);
   }
 

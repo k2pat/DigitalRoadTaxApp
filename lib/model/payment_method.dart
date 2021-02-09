@@ -9,7 +9,6 @@ class DRTPaymentMethod extends Model {
 
   void setPaymentMethod(type, {Map paymentMethod}) {
     paymentMethodType = type;
-    print(paymentMethodType);
     if (paymentMethod != null && paymentMethodType == 'CARD') {
       paymentMethodId = paymentMethod['id'];
       this.paymentMethod = paymentMethod;

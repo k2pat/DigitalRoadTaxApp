@@ -24,11 +24,11 @@ mixin DRTAccountModel on DRTBaseModel {
       await store.record('data').put(db, data);
     }
     catch (e) {
-      logout();
+      handleLogout();
     }
   }
 
-  void login(mobileNum, password) async {
+  Future<void> login(mobileNum, password) async {
     try {
       Map params = {
         'mobile_num': mobileNum,
@@ -43,7 +43,15 @@ mixin DRTAccountModel on DRTBaseModel {
       loggedIn = true;
 
       await store.record('data').put(db, data);
+    }
+    catch (e) {
+      throw e;
+    }
+  }
 
+  void handleLogin(mobileNum, password) async {
+    try {
+      await login(mobileNum, password);
       navigatorKey.currentState.pushReplacementNamed(DRTHomePage.routeName);
     }
     catch (e) {
@@ -51,7 +59,7 @@ mixin DRTAccountModel on DRTBaseModel {
     }
   }
 
-  void register(mobileNum, email, password, idNum, idType) async {
+  Future<void> register(mobileNum, email, password, idNum, idType) async {
     try {
       Map params = {
         'mobile_num': mobileNum,
@@ -61,7 +69,15 @@ mixin DRTAccountModel on DRTBaseModel {
         'id_type': idType,
       };
       Map response = await fetch('register', params);
+    }
+    catch (e) {
+      throw e;
+    }
+  }
 
+  void handleRegister(mobileNum, email, password, idNum, idType) async {
+    try {
+      await register(mobileNum, email, password, idNum, idType);
       navigatorKey.currentState.pushNamedAndRemoveUntil(DRTLoginPage.routeName, (route) => false);
       DRTSnackBar(message: 'Account registered successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
     }
@@ -70,12 +86,20 @@ mixin DRTAccountModel on DRTBaseModel {
     }
   }
 
-  void logout() async {
-    loggedIn = false;
-    accessToken = null;
-    sharedPreferences.remove('access_token');
-    await store.record('data').delete(db);
+  Future<void> logout() async {
+    try {
+      loggedIn = false;
+      accessToken = null;
+      sharedPreferences.remove('access_token');
+      await store.record('data').delete(db);
+    }
+    catch (e) {
+      throw e;
+    }
+  }
 
+  void handleLogout() async {
+    await logout();
     navigatorKey.currentState.pushNamedAndRemoveUntil(DRTLoginPage.routeName, (route) => false);
   }
 }

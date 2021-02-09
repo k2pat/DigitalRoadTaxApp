@@ -22,50 +22,9 @@ enum RenewalStatus {
 mixin DRTRenewRoadTaxModel on DRTBaseModel {
   RenewalStatus _renewalStatus;
 
-  void renew2(Map vehicle, String validityDuration, bool doAutoRenew) async {
-    try {
-      DateTime expiryDate = DateTime.parse(vehicle['rt_expiry_dt']);
-      DateTime effectiveDate = (DateTime.now().isBefore(expiryDate)) ? expiryDate : DateTime.now();
-      DateTime newExpiryDate;
-      double roadTaxAmount;
+  RenewalStatus get renewalStatus => _renewalStatus;
 
-      if (validityDuration == '1Y') {
-        newExpiryDate = DateTime(effectiveDate.year + 1, effectiveDate.month, effectiveDate.day);
-        roadTaxAmount = vehicle['ve_roadtax_rate'].toDouble();
-      } else if (validityDuration == '6M') {
-        newExpiryDate = DateTime(effectiveDate.year, effectiveDate.month + 6, effectiveDate.day);
-        roadTaxAmount = vehicle['ve_roadtax_rate'].toDouble() / 2;
-      }
-
-      Map params = {
-        'access_token': accessToken,
-        'reg_num': vehicle['ve_reg_num'],
-        'validity_duration': validityDuration,
-        'expiry_dt': DateFormat('yyyy-MM-dd').format(newExpiryDate),
-        'roadtax_amount': roadTaxAmount,
-        'auto_renew': doAutoRenew,
-      };
-      Map response = await fetch('renew_roadtax', params);
-      Map roadtax = response['roadtax'];
-
-      for (int i = 0; i < data['u_vehicles'].length; i++) {
-        if (data['u_vehicles'][i]['ve_reg_num'] == roadtax['ve_reg_num']) {
-          data['u_vehicles'][i] = { ...data['u_vehicles'][i], ...roadtax };
-          vehicle = data['u_vehicles'][i];
-          break;
-        }
-      }
-      await store.record('data').put(db, data);
-      notifyListeners();
-      navigatorKey.currentState.pushNamedAndRemoveUntil(DRTVehiclePage.routeName, ModalRoute.withName(DRTHomePage.routeName), arguments: vehicle);
-      navigatorKey.currentState.pushNamed(DRTRenewalSuccessPage.routeName, arguments: response['receipt']);
-    }
-    catch (e) {
-      throw e;
-    }
-  }
-
-  void renew(Map vehicle, String validityDuration, bool doAutoRenew, DRTPaymentMethod paymentMethod) async {
+  Future<Map> renew(Map vehicle, String validityDuration, bool doAutoRenew, DRTPaymentMethod paymentMethod) async {
     try {
       _renewalStatus = RenewalStatus.PENDING;
 
@@ -84,6 +43,7 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
 
       Map params = {
         'access_token': accessToken,
+        'device_token': deviceToken,
         'reg_num': vehicle['ve_reg_num'],
         'validity_duration': validityDuration,
         'expiry_dt': DateFormat('yyyy-MM-dd').format(newExpiryDate),
@@ -94,6 +54,17 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
       String clientSecret = response['client_secret'];
 
       var result = await StripePayment.confirmPaymentIntent(PaymentIntent(paymentMethodId: paymentMethod.paymentMethodId, clientSecret: clientSecret));
+      return response['transaction'];
+    }
+    catch (e) {
+      _renewalStatus = null;
+      throw e;
+    }
+  }
+
+  void handleRenew(Map vehicle, String validityDuration, bool doAutoRenew, DRTPaymentMethod paymentMethod) async {
+    try {
+      Map transaction = await renew(vehicle, validityDuration, doAutoRenew, paymentMethod);
 
       await waitWhile(() => _renewalStatus == RenewalStatus.PENDING);
       // if (_renewalStatus != RenewalStatus.SUCCESS) throw 'Failed to renew road tax';
@@ -104,14 +75,12 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
           break;
         }
       }
+      _renewalStatus = null;
 
       navigatorKey.currentState.pushNamedAndRemoveUntil(DRTVehiclePage.routeName, ModalRoute.withName(DRTHomePage.routeName), arguments: vehicle);
-      navigatorKey.currentState.pushNamed(DRTRenewalSuccessPage.routeName, arguments: response['transaction']);
-
-      _renewalStatus = null;
+      navigatorKey.currentState.pushNamed(DRTRenewalSuccessPage.routeName, arguments: transaction);
     }
     catch (e) {
-      _renewalStatus = null;
       throw e;
     }
   }
@@ -122,32 +91,5 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
 
   void renewalFail() {
     _renewalStatus = RenewalStatus.FAIL;
-  }
-
-  void updateAutoRenew(Map vehicle, bool autoRenew, String autoRenewDuration, DRTPaymentMethod paymentMethod) async {
-    try {
-      Map params = {
-        'access_token': accessToken,
-        'reg_num': vehicle['ve_reg_num'],
-        'auto_renew': autoRenew,
-        'auto_renew_duration': autoRenew ? autoRenewDuration : null,
-        'payment_method': paymentMethod.paymentMethodId
-      };
-      Map response = await fetch('update_auto_renew', params);
-      for (int i = 0; i < data['u_vehicles'].length; i++) {
-        if (data['u_vehicles'][i]['ve_reg_num'] == response['ve_reg_num']) {
-          data['u_vehicles'][i] = { ...data['u_vehicles'][i], ...response };
-          vehicle = data['u_vehicles'][i];
-          break;
-        }
-      }
-      await store.record('data').put(db, data);
-      notifyListeners();
-      navigatorKey.currentState.pushNamedAndRemoveUntil(DRTVehiclePage.routeName, ModalRoute.withName(DRTHomePage.routeName), arguments: vehicle);
-      DRTSnackBar(message: 'Auto-renew settings updated successfully', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
-    }
-    catch (e) {
-      throw e;
-    }
   }
 }

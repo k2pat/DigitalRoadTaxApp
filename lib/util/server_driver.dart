@@ -5,17 +5,20 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 
-const URI = 'https://k2pat.ddns.net/app';
+const URI = 'https://k2pat.ddns.net';
+const BASE_ROUTE = '/app';
 const HOST = 'k2pat.ddns.net';
 const PORT = 443;
 
-Future<Map> fetch(route, params) async {
+Future<Map> fetch(route, params, {bool overrideBaseRoute = false}) async {
     // HttpClient httpClient = new HttpClient();
     // httpClient.badCertificateCallback = ((X509Certificate cert, String host, int port) => true);
     // IOClient ioClient = new IOClient(httpClient);
 
+    String baseRoute = overrideBaseRoute ? '' : BASE_ROUTE;
     Response response = await post(
-      URI + '/' + route,
+      // URI + baseRoute + '/' + route,
+      '$URI:$PORT$baseRoute/$route',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

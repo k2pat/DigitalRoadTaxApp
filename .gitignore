@@ -8,6 +8,9 @@
 .buildlog/
 .history
 .svn/
+.test_coverage.dart
+coverage
+genhtml.perl
 
 # IntelliJ related
 *.iml

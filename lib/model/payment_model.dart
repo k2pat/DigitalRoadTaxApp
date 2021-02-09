@@ -24,16 +24,18 @@ mixin DRTPaymentModel on DRTBaseModel {
     }
   }
 
-  Future<Map> addCreditCard() async {
-    try {
-      Map params = {
-        'access_token': accessToken
-      };
-      Map response = await fetch('payment/setup_intent', params);
-      String clientSecret = response['client_secret'];
+  Future<void> addCreditCard(PaymentMethod paymentMethod) async {
+    Map params = {
+      'access_token': accessToken
+    };
+    Map response = await fetch('payment/setup_intent', params);
+    String clientSecret = response['client_secret'];
+    var result = await StripePayment.confirmSetupIntent(PaymentIntent(paymentMethodId: paymentMethod.id, clientSecret: clientSecret));
+  }
 
-      var paymentMethod = await StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest());
-      var result = await StripePayment.confirmSetupIntent(PaymentIntent(paymentMethodId: paymentMethod.id, clientSecret: clientSecret));
+  Future<Map> handleAddCreditCard() async {
+    try {
+      PaymentMethod paymentMethod = await StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest());
 
       fetchCards();
 
