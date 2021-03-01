@@ -30,7 +30,9 @@ class _DRTVehiclesListPageState extends State<DRTVehiclesListPage> {
         if (vehicles.length == 0) {
           return EasyRefresh(
               onRefresh: _refresh,
-              child: Text('You have no vehicles')
+              child: ListTile(
+                title: Text('You have no vehicles.')
+              )
           );
         }
         return EasyRefresh(

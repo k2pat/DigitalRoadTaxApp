@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class DRTDrawer extends StatelessWidget {
+  final model = GetIt.I<DRTModel>();
+
   void _logout(BuildContext context) {
-    GetIt.I<DRTModel>().handleLogout();
+    model.handleLogout();
     //Navigator.pushNamedAndRemoveUntil(context, DRTLoginPage.routeName, (route) => false);
   }
 
@@ -28,7 +30,7 @@ class DRTDrawer extends StatelessWidget {
             // ),
             ListTile(
               title: Text(
-                'ABDUL HAKEEM BIN YAMIN',
+                model.name ?? '',
                 style: TextStyle(fontWeight: FontWeight.w300),
                 textScaleFactor: 1.25,
               ),
@@ -40,7 +42,7 @@ class DRTDrawer extends StatelessWidget {
             ),
             ListTile(
               title: Text(
-                'Z32 E1P',
+                model.driverTag,
                 style: TextStyle(fontWeight: FontWeight.w200),
                 textScaleFactor: 2.5,
               ),
@@ -65,7 +67,10 @@ class DRTDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.credit_card),
               title: Text('Payment methods'),
-              onTap: () => Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName),
+              onTap: () {
+                GetIt.I<DRTModel>().fetchCards();
+                Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName);
+              },
             ),
             Divider(),
             ListTile(

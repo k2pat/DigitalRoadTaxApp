@@ -6,6 +6,7 @@ import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/view/page.dart';
 import 'package:drt_app/view/payment_methods_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -22,6 +23,9 @@ class _DRTManageAutoRenewPageState extends State<DRTManageAutoRenewPage> {
   String validityDuration;
   int paymentMethod = 0;
   DRTPaymentMethod _paymentMethod;
+
+  bool _validatePaymentMethod = true;
+  bool _loading = false;
 
   String _getPaymentMethodLabel() {
     if (_paymentMethod.paymentMethodType == 'CARD') {
@@ -40,10 +44,17 @@ class _DRTManageAutoRenewPageState extends State<DRTManageAutoRenewPage> {
 
   void _updateAutoRenew(bool autoRenew, {String duration}) async {
     try {
-      await GetIt.I<DRTModel>().updateAutoRenew(vehicle, autoRenew, duration, _paymentMethod);
+      if (_paymentMethod.paymentMethodType != null) {
+        setState(() => _loading = true);
+        await GetIt.I<DRTModel>().updateAutoRenew(vehicle, autoRenew, duration, _paymentMethod);
+      }
+      else {
+        setState(() => _validatePaymentMethod = false);
+      }
     } catch (e) {
       errorSnackBar(context, e);
     }
+    setState(() => _loading = false);
   }
 
   Widget _buildBody(BuildContext context, Map vehicle) {
@@ -94,13 +105,15 @@ class _DRTManageAutoRenewPageState extends State<DRTManageAutoRenewPage> {
           Divider(),
           ScopedModelDescendant<DRTPaymentMethod>(
               builder: (context, child, model) {
+                TextStyle style;
+                if (_validatePaymentMethod == false && _paymentMethod.paymentMethodType == null) style = TextStyle(fontWeight: FontWeight.w500, color: Colors.red);
                 return ListTile(
                   title: Text('Payment method', textScaleFactor: 0.95,),
                   onTap: () => Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName, arguments: _paymentMethod),
                   trailing: Text('Change', style: TextStyle(color: primaryColor)),
                   subtitle: Text(_getPaymentMethodLabel(),
                       textScaleFactor: 1.2,
-                      style: TextStyle(fontWeight: FontWeight.w500)
+                      style: style ?? TextStyle(fontWeight: FontWeight.w500)
                   ),
                 );
               }
@@ -122,11 +135,15 @@ class _DRTManageAutoRenewPageState extends State<DRTManageAutoRenewPage> {
     );
   }
 
+  Widget _build(BuildContext context, Map vehicle) {
+    Color primaryColor = Theme.of(context).primaryColor;
+    return _loading == true ? Align(alignment: Alignment.center, child: SpinKitRing(color: primaryColor)) : _buildBody(context, vehicle);
+  }
+
   @override
   Widget build(BuildContext context) {
     vehicle = ModalRoute.of(context).settings.arguments;
     String title = (vehicle['ve_auto_renew'] == true) ? 'Manage auto-renew' : 'Enable auto-renew';
-    GetIt.I<DRTModel>().fetchCards();
     _paymentMethod = DRTPaymentMethod();
     return ScopedModel<DRTPaymentMethod>(
         model: _paymentMethod,
@@ -141,7 +158,7 @@ class _DRTManageAutoRenewPageState extends State<DRTManageAutoRenewPage> {
             }
             if (paymentMethod != null) _paymentMethod.setPaymentMethod('CARD', paymentMethod: paymentMethod);
 
-            return DRTPage('Manage auto-renew', _buildBody(context, vehicle));
+            return DRTPage('Manage auto-renew', _build(context, vehicle));
           }
         )
     );

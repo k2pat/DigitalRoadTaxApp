@@ -1,3 +1,4 @@
+import 'package:drt_app/model/model.dart';
 import 'package:drt_app/model/vehicle.dart';
 import 'package:drt_app/view/manage_auto_renew_page.dart';
 import 'package:drt_app/view/manage_drivers_page.dart';
@@ -5,6 +6,7 @@ import 'package:drt_app/view/page.dart';
 import 'package:drt_app/view/renew_road_tax_page.dart';
 import 'package:drt_app/view/road_tax_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jiffy/jiffy.dart';
 
 class DRTVehiclePage extends StatefulWidget {
@@ -33,7 +35,10 @@ class _DRTVehiclePageState extends State<DRTVehiclePage> {
               textScaleFactor: 1.25,
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: renewDisabled ? null : () => Navigator.pushNamed(context, DRTRenewRoadTaxPage.routeName, arguments: vehicle),
+            onPressed: renewDisabled ? null : () {
+              GetIt.I<DRTModel>().fetchCards();
+              Navigator.pushNamed(context, DRTRenewRoadTaxPage.routeName, arguments: vehicle);
+            },
           ),
         ),
         SizedBox(height: 16),
@@ -48,8 +53,10 @@ class _DRTVehiclePageState extends State<DRTVehiclePage> {
               style: TextStyle(color: Colors.white),
             ),
             onPressed:
-              Jiffy().isAfter(Jiffy(vehicle['rt_expiry_dt']).endOf(Units.DAY))
-                  ? null : () => Navigator.pushNamed(context, DRTManageAutoRenewPage.routeName, arguments: vehicle),
+              Jiffy().isAfter(Jiffy(vehicle['rt_expiry_dt']).endOf(Units.DAY)) ? null : () {
+                GetIt.I<DRTModel>().fetchCards();
+                Navigator.pushNamed(context, DRTManageAutoRenewPage.routeName, arguments: vehicle);
+              },
           ),
         ),
         SizedBox(height: 16),
@@ -61,7 +68,7 @@ class _DRTVehiclePageState extends State<DRTVehiclePage> {
               'Manage drivers',
               textScaleFactor: 1.25,
             ),
-            onPressed: () => Navigator.pushNamed(context, DRTManageDriversPage.routeName),
+            onPressed: () => Navigator.pushNamed(context, DRTManageDriversPage.routeName, arguments: vehicle),
           ),
         ),
       ],

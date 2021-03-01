@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:drt_app/model/model.dart';
+import 'package:drt_app/view/add_driver_page.dart';
 import 'package:drt_app/view/driving_page.dart';
 import 'package:drt_app/view/home_page.dart';
 import 'package:drt_app/view/login_page.dart';
@@ -84,6 +85,7 @@ class DRT extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var initialRoute = model.loggedIn ? DRTHomePage.routeName : DRTLoginPage.routeName;
+    model.fetchCards();
     return ScopedModel(
         model: model,
         child: MaterialApp(
@@ -107,6 +109,7 @@ class DRT extends StatelessWidget {
               DRTRenewalSuccessPage.routeName: (context) => DRTRenewalSuccessPage(),
               DRTManageAutoRenewPage.routeName: (context) => DRTManageAutoRenewPage(),
               DRTManageDriversPage.routeName: (context) => DRTManageDriversPage(),
+              DRTAddDriverPage.routeName: (context) => DRTAddDriverPage(),
             }
         )
     );

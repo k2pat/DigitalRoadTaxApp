@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 
 mixin DRTAccountModel on DRTBaseModel {
+  String get name => data['u_name'];
+
   void initialize() async {
     accessToken = sharedPreferences.getString('access_token');
     loggedIn = (accessToken == null || accessToken.isEmpty) ? false : true;
@@ -59,9 +61,10 @@ mixin DRTAccountModel on DRTBaseModel {
     }
   }
 
-  Future<void> register(mobileNum, email, password, idNum, idType) async {
+  Future<void> register(name, mobileNum, email, password, idNum, idType) async {
     try {
       Map params = {
+        'name': name,
         'mobile_num': mobileNum,
         'email': email,
         'password': password,
@@ -75,9 +78,9 @@ mixin DRTAccountModel on DRTBaseModel {
     }
   }
 
-  void handleRegister(mobileNum, email, password, idNum, idType) async {
+  void handleRegister(name, mobileNum, email, password, idNum, idType) async {
     try {
-      await register(mobileNum, email, password, idNum, idType);
+      await register(name, mobileNum, email, password, idNum, idType);
       navigatorKey.currentState.pushNamedAndRemoveUntil(DRTLoginPage.routeName, (route) => false);
       DRTSnackBar(message: 'Account registered successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
     }

@@ -4,6 +4,7 @@ import 'package:drt_app/util/snackbar.dart';
 import 'package:drt_app/util/input_formatter.dart';
 import 'package:drt_app/view/page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:get_it/get_it.dart';
@@ -19,28 +20,24 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
   DRTModel drtModel = GetIt.I<DRTModel>();
   DRTPaymentMethod _paymentMethod;
 
-  @override
-  initState() {
-    super.initState();
-    StripePayment.setOptions(
-        StripeOptions(
-            publishableKey:"pk_test_51IDtdsCFbMmCdmOJ3jHD8cN0K9gYJPjnyTPQUHxarFHXEN0iQLGPLt6s4ptfEK7kJelybeSCyJh3mdHOW5gyHyG700A8mM3TTP",
-            androidPayMode: 'test'
-        ));
-  }
+  bool _loading = false;
 
   void _setPaymentMethod(String type, {Map paymentMethod}) {
     setState(() => _paymentMethod.setPaymentMethod(type, paymentMethod: paymentMethod));
   }
 
   void _addCreditCard() async {
+    setState(() => _loading = true);
     Map paymentMethod = await drtModel.handleAddCreditCard();
+    setState(() => _loading = false);
     if (paymentMethod != null)
       _setPaymentMethod('CARD', paymentMethod: paymentMethod);
   }
 
   void _removeCreditCard(cardData) async {
+    setState(() => _loading = true);
     await drtModel.removeCreditCard(cardData);
+    setState(() => _loading = false);
   }
 
   Widget _buildSavedPaymentMethods(BuildContext context, cards) {
@@ -53,6 +50,8 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
         Map cardData = cards[index];
         Map card = cardData['card'];
 
+        String cardLabel = capitalize(card['brand']) + ' •••• ' + capitalize(card['last4']);
+
         if (_paymentMethod != null) {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
@@ -62,7 +61,7 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
                 groupValue: _paymentMethod.paymentMethodId,
                 onChanged: (value) => _setPaymentMethod('CARD', paymentMethod: cardData),
               ),
-              title: Text(capitalize(card['brand']) + ' •••• ' + card['last4']),
+              title: Text(cardLabel),
               trailing: Icon(Icons.credit_card, color: primaryColor),
             )
           );
@@ -71,10 +70,36 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
             padding: EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
               leading: Icon(Icons.credit_card, color: primaryColor),
-              title: Text(capitalize(card['brand']) + ' •••• ' + capitalize(card['last4'])),
+              title: Text(cardLabel),
               trailing: IconButton(
                 icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () => _removeCreditCard(cardData),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Confirm remove'),
+                        content: Text('Are you sure you want to remove $cardLabel'),
+                        actions: [
+                          FlatButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel')
+                          ),
+                          FlatButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _removeCreditCard(cardData);
+                              },
+                              child: Text('Remove')
+                          ),
+                        ]
+                      );
+                    }
+                  );
+                 ;
+                },
               ),
             )
           );
@@ -165,6 +190,7 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
   }
 
   Widget _buildBody(BuildContext context) {
+    Color primaryColor = Theme.of(context).primaryColor;
     return ScopedModelDescendant<DRTModel>(
       builder: (context, child, model) {
         List cards = model.cards ?? [];
@@ -181,10 +207,19 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
     );
   }
 
+  Widget _buildStack(BuildContext context) {
+    Color primaryColor = Theme.of(context).primaryColor;
+    return Stack(
+      children: [
+        _buildBody(context),
+        _loading == true ? Align(alignment: Alignment.center, child: SpinKitRing(color: primaryColor)) : SizedBox(height: 0),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _paymentMethod = ModalRoute.of(context).settings.arguments ?? null;
-    GetIt.I<DRTModel>().fetchCards();
-    return DRTPage('Payment methods', _buildBody(context));
+    return DRTPage('Payment methods', _buildStack(context));
   }
 }

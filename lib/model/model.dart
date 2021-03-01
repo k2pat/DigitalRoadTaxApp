@@ -10,6 +10,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:sembast/sembast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'driver_model.dart';
+
 abstract class DRTBaseModel extends Model {
   final String deviceToken;
   final SharedPreferences sharedPreferences = GetIt.I<SharedPreferences>();
@@ -25,6 +27,6 @@ abstract class DRTBaseModel extends Model {
 }
 
 class DRTModel extends DRTBaseModel
-    with DRTAccountModel, DRTVehicleModel, DRTRenewRoadTaxModel, DRTAutoRenewModel, DRTPaymentModel {
+    with DRTAccountModel, DRTVehicleModel, DRTRenewRoadTaxModel, DRTAutoRenewModel, DRTPaymentModel, DRTDriverModel {
   DRTModel(String deviceToken) : super(deviceToken);
 }

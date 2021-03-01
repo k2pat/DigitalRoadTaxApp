@@ -9,8 +9,13 @@ mixin DRTPaymentModel on DRTBaseModel {
   List cards = [];
   Map autoRenewPaymentMethods = {};
 
+  bool fetchingCards = false;
+
   void fetchCards() async {
     try {
+      if (fetchingCards == true) return;
+      fetchingCards = true;
+
       Map params = {
         'access_token': accessToken
       };
@@ -18,9 +23,12 @@ mixin DRTPaymentModel on DRTBaseModel {
       cards = response['cards'];
       autoRenewPaymentMethods = response['auto_renew_payment_methods'];
       notifyListeners();
+      fetchingCards = false;
     }
     catch (e) {
-      errorSnackBar(navigatorKey.currentContext, e);
+      fetchingCards = false;
+      // errorSnackBar(navigatorKey.currentContext, e);
+      print(e);
     }
   }
 
@@ -31,13 +39,14 @@ mixin DRTPaymentModel on DRTBaseModel {
     Map response = await fetch('payment/setup_intent', params);
     String clientSecret = response['client_secret'];
     var result = await StripePayment.confirmSetupIntent(PaymentIntent(paymentMethodId: paymentMethod.id, clientSecret: clientSecret));
+
+    fetchCards();
   }
 
   Future<Map> handleAddCreditCard() async {
     try {
       PaymentMethod paymentMethod = await StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest());
-
-      fetchCards();
+      await addCreditCard(paymentMethod);
 
       DRTSnackBar(message: 'Card saved successfully!', icon: Icon(Icons.check, color: Colors.green)).show(navigatorKey.currentContext);
       return paymentMethod.toJson();

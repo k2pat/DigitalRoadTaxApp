@@ -24,14 +24,20 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
   bool doAutoRenew = false;
   int paymentMethod = 0;
   DRTModel drtModel = GetIt.I<DRTModel>();
-  //int effectiveDate = 0;
   bool _loading = false;
   DRTPaymentMethod _paymentMethod;
 
+  bool _validatePaymentMethod = true;
+
   void _renew() async {
-    setState(() => _loading = true);
     try {
-      await GetIt.I<DRTModel>().handleRenew(vehicle, validityDuration, doAutoRenew, _paymentMethod);
+      if (_paymentMethod.paymentMethodType != null) {
+        setState(() => _loading = true);
+        await GetIt.I<DRTModel>().handleRenew(vehicle, validityDuration, doAutoRenew, _paymentMethod);
+      }
+      else {
+        setState(() => _validatePaymentMethod = false);
+      }
     } catch (e) {
       errorSnackBar(context, e);
     }
@@ -100,21 +106,6 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
                   groupValue: validityDuration,
                   onChanged: (value) => setState(() => validityDuration = value),
                 ),
-                // ListTile(
-                //   title: Text('Select effective date', textScaleFactor: 0.95,),
-                // ),
-                // RadioListTile(
-                //   title: Text('Today'),
-                //   value: 1,
-                //   groupValue: effectiveDate,
-                //   onChanged: (value) => setState(() => effectiveDate = value),
-                // ),
-                // RadioListTile(
-                //   title: Text('Later'),
-                //   value: 2,
-                //   groupValue: effectiveDate,
-                //   onChanged: (value) => setState(() => effectiveDate = value),
-                // ),
                 SizedBox(height: 16),
                 CheckboxListTile(
                   title: Text('Enable auto-renew'),
@@ -143,57 +134,19 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
                 Divider(),
                 ScopedModelDescendant<DRTPaymentMethod>(
                   builder: (context, child, model) {
+                    TextStyle style;
+                    if (_validatePaymentMethod == false && _paymentMethod.paymentMethodType == null) style = TextStyle(fontWeight: FontWeight.w500, color: Colors.red);
                     return ListTile(
                       title: Text('Payment method', textScaleFactor: 0.95,),
                       onTap: () => Navigator.pushNamed(context, DRTPaymentMethodsPage.routeName, arguments: _paymentMethod),
                       trailing: Text('Change', style: TextStyle(color: primaryColor)),
                       subtitle: Text(_getPaymentMethodLabel(),
                           textScaleFactor: 1.2,
-                          style: TextStyle(fontWeight: FontWeight.w500)
+                          style: style ?? TextStyle(fontWeight: FontWeight.w500)
                       ),
                     );
                   }
                 ),
-                // ListTile(
-                //   leading: Radio(value: 1,
-                //     groupValue: paymentMethod,
-                //     onChanged: (value) => setState(() => paymentMethod = value),
-                //   ),
-                //   title: Text('Visa •••• 1234'),
-                //   trailing: Icon(Icons.credit_card, color: primaryColor),
-                // ),
-                // ListTile(
-                //   leading: Radio(value: 2,
-                //     groupValue: paymentMethod,
-                //     onChanged: (value) => setState(() => paymentMethod = value),
-                //   ),
-                //   title: Text('Maybank •••• 5678'),
-                //   trailing: Icon(Icons.account_balance, color: primaryColor),
-                // ),
-                // ListTile(
-                //   leading: Radio(value: 3,
-                //     groupValue: paymentMethod,
-                //     onChanged: (value) => setState(() => paymentMethod = value),
-                //   ),
-                //   title: Text('New credit/debit card'),
-                //   trailing: Icon(Icons.credit_card, color: primaryColor),
-                // ),
-                // ListTile(
-                //   leading: Radio(value: 4,
-                //     groupValue: paymentMethod,
-                //     onChanged: (value) => setState(() => paymentMethod = value),
-                //   ),
-                //   title: Text('New bank account'),
-                //   trailing: Icon(Icons.account_balance, color: primaryColor),
-                // ),
-                // ListTile(
-                //   leading: Radio(value: 5,
-                //     groupValue: paymentMethod,
-                //     onChanged: (value) => setState(() => paymentMethod = value),
-                //   ),
-                //   title: Text('Use unifi Mobile billing'),
-                //   trailing: Icon(Icons.speaker_phone, color: primaryColor),
-                // ),
                 SizedBox(height: 16),
                 RaisedButton(
                   child: Text('Proceed', style: TextStyle(color: Colors.white)),
