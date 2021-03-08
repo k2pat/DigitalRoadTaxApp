@@ -7,7 +7,7 @@ import 'package:drt_app/util/snackbar.dart';
 mixin DRTDriverModel on DRTBaseModel {
   List get drivers => _getDrivers();
   List get drivingVehicles => data['u_driving_vehicles'] ?? [];
-  String get driverTag => data['u_driver_tag'];
+  String get driverTag => data['u_driver_tag'] ?? '';
 
   List _getDrivers() {
     List list = data['u_drivers'] ?? [];
