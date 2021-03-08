@@ -98,7 +98,6 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
                       );
                     }
                   );
-                 ;
                 },
               ),
             )
@@ -182,7 +181,55 @@ class _DRTPaymentMethodsPageState extends State<DRTPaymentMethodsPage> {
                 onChanged: (value) => _setPaymentMethod(value),
               ),
               trailing: Icon(Icons.speaker_phone),
-              title: Text('unifi Mobile billing'),
+              title: Text('Mobile billing'),
+            )
+        ),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              leading: Radio(
+                value: 'JOMPAY',
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
+              ),
+              trailing: Image(image: AssetImage('assets/jompay.png')),
+              title: Text('JomPAY'),
+            )
+        ),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              leading: Radio(
+                value: 'GRABPAY',
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
+              ),
+              trailing: Image(image: AssetImage('assets/grabpay.png')),
+              title: Text('GrabPay'),
+            )
+        ),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              leading: Radio(
+                value: 'TNG',
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
+              ),
+              trailing: Image(image: AssetImage('assets/tng.png')),
+              title: Text("Touch 'n Go eWallet"),
+            )
+        ),
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              leading: Radio(
+                value: 'BOOST',
+                groupValue: _paymentMethod.paymentMethodType,
+                onChanged: (value) => _setPaymentMethod(value),
+              ),
+              trailing: Image(image: AssetImage('assets/boost.png')),
+              title: Text('Boost'),
             )
         ),
       ],

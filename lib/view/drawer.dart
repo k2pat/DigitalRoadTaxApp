@@ -2,8 +2,10 @@ import 'package:drt_app/model/model.dart';
 import 'package:drt_app/view/login_page.dart';
 import 'package:drt_app/view/notification_settings_page.dart';
 import 'package:drt_app/view/payment_methods_page.dart';
+import 'package:drt_app/view/saved_drivers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:share/share.dart';
 
 class DRTDrawer extends StatelessWidget {
   final model = GetIt.I<DRTModel>();
@@ -30,7 +32,7 @@ class DRTDrawer extends StatelessWidget {
             // ),
             ListTile(
               title: Text(
-                model.name ?? '',
+                model.name,
                 style: TextStyle(fontWeight: FontWeight.w300),
                 textScaleFactor: 1.25,
               ),
@@ -46,13 +48,15 @@ class DRTDrawer extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w200),
                 textScaleFactor: 2.5,
               ),
-              trailing: IconButton(icon: Icon(Icons.share), onPressed: () {  },),
+              trailing: IconButton(icon: Icon(Icons.share), onPressed: () =>
+                  Share.share('Add me as a driver on Digital Road Tax with driver tag ' + model.driverTag, subject: model.driverTag + ' - Driver Tag')
+              ),
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.people),
               title: Text('Saved drivers'),
-              onTap: () {}//=> Navigator.pushNamed(context, DRTRegisterVehiclePage.routeName),
+              onTap: () => Navigator.pushNamed(context, DRTSavedDriversPage.routeName),
             ),
             ListTile(
               leading: Icon(Icons.settings),

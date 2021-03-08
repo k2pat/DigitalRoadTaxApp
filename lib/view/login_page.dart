@@ -29,6 +29,8 @@ class _DRTLoginPageState extends State<DRTLoginPage> {
         await GetIt.I<DRTModel>().handleLogin(_mobileNumController.text, _passwordController.text);
       }
     } catch (e) {
+      if (e.toString() == 'Unauthorized') errorSnackBar(context, 'Invalid login credentials');
+      else
       errorSnackBar(context, e);
     }
     setState(() => _loading = false);

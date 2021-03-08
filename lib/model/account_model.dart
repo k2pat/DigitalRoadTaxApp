@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:sembast/sembast.dart';
 
 mixin DRTAccountModel on DRTBaseModel {
-  String get name => data['u_name'];
+  String get name => data['u_name'] ?? '';
 
   void initialize() async {
     accessToken = sharedPreferences.getString('access_token');
@@ -20,6 +20,7 @@ mixin DRTAccountModel on DRTBaseModel {
     try {
       Map params = {
         'access_token': accessToken,
+        'device_token': deviceToken
       };
       Map response = await fetch('sync', params);
       data = response;

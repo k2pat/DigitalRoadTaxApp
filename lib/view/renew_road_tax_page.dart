@@ -54,6 +54,18 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
     else if (_paymentMethod.paymentMethodType == 'MOBILE') {
       return 'Mobile billing';
     }
+    else if (_paymentMethod.paymentMethodType == 'JOMPAY') {
+      return 'JomPAY';
+    }
+    else if (_paymentMethod.paymentMethodType == 'GRABPAY') {
+      return 'GrabPay';
+    }
+    else if (_paymentMethod.paymentMethodType == 'TNG') {
+      return "Touch 'n Go eWallet";
+    }
+    else if (_paymentMethod.paymentMethodType == 'BOOST') {
+      return 'Boost';
+    }
     else {
       return 'Select a payment method';
     }
@@ -126,7 +138,7 @@ class _DRTRenewRoadTaxPageState extends State<DRTRenewRoadTaxPage> {
                 ListTile(
                   title: Text('Road tax amount'),//, textScaleFactor: 1.25),
                   trailing: Text(
-                    'RM ' + (vehicle['ve_roadtax_rate'] * _validityFactor * 0.5).toStringAsFixed(2),
+                    'RM ' + ((vehicle['ve_roadtax_rate'] * _validityFactor * 0.5 * 100).roundToDouble() / 100).toStringAsFixed(2),
                     textScaleFactor: 2,
                     style: TextStyle(fontWeight: FontWeight.w300),
                   ),

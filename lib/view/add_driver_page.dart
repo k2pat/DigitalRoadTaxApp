@@ -50,6 +50,7 @@ class _DRTAddDriverPageState extends State<DRTAddDriverPage> {
             validator: (value) {
               if (value.isEmpty) return 'Please enter a driver tag';
               else if (value == model.driverTag) return 'Please enter a different user\'s driver tag';
+              else if (model.isDriverSaved(value)) return 'This driver has already been saved';
               else return null;
             },
           ),
@@ -62,6 +63,7 @@ class _DRTAddDriverPageState extends State<DRTAddDriverPage> {
             ),
             validator: (value) {
               if (value.isEmpty) return 'Please enter a nickname for the driver';
+              else if (model.isNicknameSaved(value)) return 'This nickname has already been saved';
               else return null;
             },
           ),

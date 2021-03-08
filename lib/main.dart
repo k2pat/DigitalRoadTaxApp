@@ -12,6 +12,7 @@ import 'package:drt_app/view/payment_methods_page.dart';
 import 'package:drt_app/view/registration_page.dart';
 import 'package:drt_app/view/renew_road_tax_page.dart';
 import 'package:drt_app/view/renewal_success_page.dart';
+import 'package:drt_app/view/saved_drivers_page.dart';
 import 'package:drt_app/view/vehicle_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +111,7 @@ class DRT extends StatelessWidget {
               DRTManageAutoRenewPage.routeName: (context) => DRTManageAutoRenewPage(),
               DRTManageDriversPage.routeName: (context) => DRTManageDriversPage(),
               DRTAddDriverPage.routeName: (context) => DRTAddDriverPage(),
+              DRTSavedDriversPage.routeName: (context) => DRTSavedDriversPage(),
             }
         )
     );

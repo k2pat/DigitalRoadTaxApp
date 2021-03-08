@@ -40,6 +40,7 @@ mixin DRTRenewRoadTaxModel on DRTBaseModel {
         newExpiryDate = DateTime(effectiveDate.year, effectiveDate.month + 6, effectiveDate.day);
         roadTaxAmount = vehicle['ve_roadtax_rate'].toDouble() / 2;
       }
+      roadTaxAmount = (roadTaxAmount * 100).roundToDouble() / 100;
 
       Map params = {
         'access_token': accessToken,

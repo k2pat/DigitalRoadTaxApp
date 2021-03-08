@@ -1,5 +1,6 @@
 import 'package:drt_app/model/model.dart';
 import 'package:drt_app/util/snackbar.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:drt_app/view/page.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -110,6 +111,11 @@ class _DRTRegistrationPageState extends State<DRTRegistrationPage> {
               onSaved: (value) {},
               enableSuggestions: false,
               autocorrect: false,
+              validator: (value) {
+                if (value.isEmpty) return 'Please enter your email';
+                else if (!EmailValidator.validate(value)) return 'Badly formatted email';
+                else return null;
+              },
             ),
             SizedBox(height: 16),
             TextFormField(
@@ -122,7 +128,7 @@ class _DRTRegistrationPageState extends State<DRTRegistrationPage> {
               enableSuggestions: false,
               autocorrect: false,
               validator: (value) {
-                if (value.isEmpty) return 'Please enter a mobile number';
+                if (value.isEmpty) return 'Please enter your mobile number';
                 else return null;
               },
             ),
@@ -138,7 +144,7 @@ class _DRTRegistrationPageState extends State<DRTRegistrationPage> {
               enableSuggestions: false,
               autocorrect: false,
               validator: (value) {
-                if (value.isEmpty) return 'Please enter a password';
+                if (value.isEmpty) return 'Please enter your password';
                 else return null;
               },
             ),
@@ -153,7 +159,8 @@ class _DRTRegistrationPageState extends State<DRTRegistrationPage> {
               enableSuggestions: false,
               autocorrect: false,
               validator: (value) {
-                if (value != _passwordController.text) return 'Does not match password';
+                if (value.isEmpty) return 'Please enter confirm your password';
+                else if (value != _passwordController.text) return 'Does not match password';
                 else return null;
               },
             ),
